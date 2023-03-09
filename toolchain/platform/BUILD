@@ -5,3 +5,4 @@ package(
 )
 
 declare_platforms()
+declare_libc_aware_platforms()
