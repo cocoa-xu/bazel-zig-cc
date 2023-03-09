@@ -1,6 +1,6 @@
 load("@bazel-zig-cc//toolchain/private:defs.bzl", "LIBCS")
 
-_CPUS = (("x86_64", "amd64"), ("aarch64", "arm64"))
+_CPUS = (("x86_64", "amd64"), ("aarch64", "arm64"), ("riscv64", "riscv64"))
 _OS = {
     "linux": ["linux"],
     "macos": ["macos", "darwin"],
