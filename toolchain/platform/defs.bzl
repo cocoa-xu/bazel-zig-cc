@@ -39,7 +39,8 @@ def declare_platform(gocpu, zigcpu, bzlos, os, suffix = "", extra_constraints = 
         constraint_values = constraint_values,
     )
 
-    native.platform(
-        name = "{os}_{gocpu}{suffix}".format(os = os, gocpu = gocpu, suffix = suffix),
-        constraint_values = constraint_values,
-    )
+    if gocpu != zigcpu:
+        native.platform(
+            name = "{os}_{gocpu}{suffix}".format(os = os, gocpu = gocpu, suffix = suffix),
+            constraint_values = constraint_values,
+        )

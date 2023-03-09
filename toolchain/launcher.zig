@@ -254,7 +254,7 @@ fn getTarget(self_exe: []const u8) error{BadParent}!?[]const u8 {
     var it = mem.split(u8, triple, "-");
 
     const arch = it.next() orelse return error.BadParent;
-    if (mem.indexOf(u8, "aarch64,x86_64", arch) == null)
+    if (mem.indexOf(u8, "aarch64,riscv64,x86_64", arch) == null)
         return error.BadParent;
 
     const got_os = it.next() orelse return error.BadParent;
