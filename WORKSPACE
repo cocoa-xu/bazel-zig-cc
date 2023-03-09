@@ -69,4 +69,7 @@ register_toolchains(
     # arm64 toolchains for libc-aware platforms:
     "@zig_sdk//libc_aware/toolchain:linux_arm64_gnu.2.28",
     "@zig_sdk//libc_aware/toolchain:linux_arm64_musl",
+    # riscv64 toolchains for libc-aware platforms:
+    "@zig_sdk//libc_aware/toolchain:linux_riscv64_gnu.2.28",
+    "@zig_sdk//libc_aware/toolchain:linux_riscv64_musl",
 )

@@ -23,7 +23,7 @@ scratching, I promise.
 Add this to your `WORKSPACE`:
 
 ```
-BAZEL_ZIG_CC_VERSION = "v1.0.1"
+BAZEL_ZIG_CC_VERSION = "v1.0.2"
 
 http_archive(
     name = "bazel-zig-cc",
