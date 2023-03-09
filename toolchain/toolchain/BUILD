@@ -5,5 +5,5 @@ package(
     default_visibility = ["//visibility:public"],
 )
 
-declare_toolchains()
+# declare_toolchains()
 declare_libc_aware_toolchains()
