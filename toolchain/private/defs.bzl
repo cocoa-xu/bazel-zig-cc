@@ -120,6 +120,8 @@ def _target_windows(gocpu, zigcpu):
 
 def _target_linux_gnu(gocpu, zigcpu, glibc_version):
     glibc_suffix = "gnu.{}".format(glibc_version)
+    if zigcpu == "arm":
+        glibc_suffix = "gnueabihf.{}".format(glibc_version)
 
     compiler_extra_includes = []
     linker_version_scripts = []
@@ -135,7 +137,7 @@ def _target_linux_gnu(gocpu, zigcpu, glibc_version):
         gotarget = "linux_{}_{}".format(gocpu, glibc_suffix),
         zigtarget = "{}-linux-{}".format(zigcpu, glibc_suffix),
         includes = [
-                       "libc/include/{}-linux-gnu".format(zigcpu),
+                       "libc/include/{}-linux-{}".format(zigcpu, "gnu" if zigcpu != "arm" else "gnueabihf"),
                        "libc/include/generic-glibc",
                    ] +
                    # x86_64-linux-any is x86_64-linux and x86-linux combined.
@@ -160,10 +162,10 @@ def _target_linux_gnu(gocpu, zigcpu, glibc_version):
 
 def _target_linux_musl(gocpu, zigcpu):
     return struct(
-        gotarget = "linux_{}_musl".format(gocpu),
-        zigtarget = "{}-linux-musl".format(zigcpu),
+        gotarget = "linux_{}_{}".format(gocpu, "musl" if zigcpu != "arm" else "musleabihf"),
+        zigtarget = "{}-linux-{}".format(zigcpu, "musl" if zigcpu != "arm" else "musleabihf"),
         includes = [
-                       "libc/include/{}-linux-musl".format(zigcpu),
+                       "libc/include/{}-linux-{}".format(zigcpu, "musl" if zigcpu != "arm" else "musleabihf"),
                        "libc/include/generic-musl",
                    ] +
                    (["libc/include/riscv-linux-any"] if zigcpu == "riscv64" else []) +
@@ -180,7 +182,7 @@ def _target_linux_musl(gocpu, zigcpu):
             "@platforms//os:linux",
             "@platforms//cpu:{}".format(zigcpu),
         ],
-        libc_constraint = "@zig_sdk//libc:musl",
+        libc_constraint = "@zig_sdk//libc:{}".format("musl" if zigcpu != "arm" else "musleabihf"),
         tool_paths = {"ld": "ld.lld"},
         artifact_name_patterns = [],
     )
