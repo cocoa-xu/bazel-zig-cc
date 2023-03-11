@@ -32,10 +32,10 @@ cc_binary(
         ("linux_amd64_gnu.2.19", "//libc_aware/platform:linux_amd64_gnu.2.19", "glibc_2.19"),
         ("linux_amd64_gnu.2.28", "//libc_aware/platform:linux_amd64_gnu.2.28", "glibc_2.28"),
         ("linux_arm64_musl", "//libc_aware/platform:linux_arm64_musl", "non-glibc"),
-        ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl", "non-glibc"),
+        ("linux_arm_musleabihf", "//libc_aware/platform:linux_arm_musleabihf", "non-glibc"),
         ("linux_amd64", "//platform:linux_amd64", "glibc_2.19"),
         ("linux_arm64", "//platform:linux_arm64", "glibc_2.28"),
-        ("linux_armv6", "//platform:linux_armv6", "glibc_2.28"),
+        ("linux_arm", "//platform:linux_arm", "glibc_2.28"),
     ]
 ]
 
@@ -63,10 +63,10 @@ cc_binary(
         ("linux_amd64_gnu.2.19", "//libc_aware/platform:linux_amd64_gnu.2.19", "glibc_2.19"),
         ("linux_amd64_gnu.2.28", "//libc_aware/platform:linux_amd64_gnu.2.28", "glibc_2.28"),
         ("linux_arm64_musl", "//libc_aware/platform:linux_arm64_musl", "non-glibc"),
-        ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl", "non-glibc"),
+        ("linux_arm_musleabihf", "//libc_aware/platform:linux_arm_musleabihf", "non-glibc"),
         ("linux_amd64", "//platform:linux_amd64", "glibc_2.19"),
         ("linux_arm64", "//platform:linux_arm64", "glibc_2.28"),
-        ("linux_armv6", "//platform:linux_armv6", "glibc_2.28"),
+        ("linux_arm", "//platform:linux_arm", "glibc_2.28"),
     ]
 ]
 
@@ -75,9 +75,9 @@ cc_binary(
         platform_binary(
             name = "which_libc_{}".format(name),
             src = "which_libc",
-            env = {"QEMU_LD_PREFIX": "/usr/arm-linux-gnueabihf"} if "armv6" in name else {},
+            env = {"QEMU_LD_PREFIX": "/usr/arm-linux-gnueabihf"} if "linux_arm" == name else {},
             platform = platform,
-            run_under = "qemu-arm-static" if "armv6" in name else "",
+            run_under = "qemu-arm-static" if "linux_arm" == name else "",
         ),
         sh_test(
             name = "test_libc_{}".format(name),
@@ -94,9 +94,9 @@ cc_binary(
         ("linux_amd64_gnu.2.19", "//libc_aware/platform:linux_amd64_gnu.2.19", "glibc_2.19"),
         ("linux_amd64_gnu.2.28", "//libc_aware/platform:linux_amd64_gnu.2.28", "glibc_2.28"),
         ("linux_arm64_musl", "//libc_aware/platform:linux_arm64_musl", "non-glibc"),
-        ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl", "non-glibc"),
+        ("linux_arm_musleabihf", "//libc_aware/platform:linux_arm_musleabihf", "non-glibc"),
         ("linux_amd64", "//platform:linux_amd64", "glibc_2.19"),
         ("linux_arm64", "//platform:linux_arm64", "glibc_2.28"),
-        ("linux_armv6", "//platform:linux_armv6", "glibc_2.28"),
+        ("linux_arm", "//platform:linux_arm", "glibc_2.28"),
     ]
 ]
