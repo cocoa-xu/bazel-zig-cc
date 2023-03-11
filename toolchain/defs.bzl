@@ -211,6 +211,9 @@ def _zig_repository_impl(repository_ctx):
     res_search_arm64 = _glibc_hack("res_search", "__res_search@GLIBC_2.17")
     repository_ctx.file("glibc-hacks/res_search-arm64.map", content = res_search_arm64.mapfile)
     repository_ctx.file("glibc-hacks/res_search-arm64.h", content = res_search_arm64.header)
+    res_search_arm = _glibc_hack("res_search", "__res_search@GLIBC_2.17")
+    repository_ctx.file("glibc-hacks/res_search-arm.map", content = res_search_arm.mapfile)
+    repository_ctx.file("glibc-hacks/res_search-arm.h", content = res_search_arm.header)
 
 zig_repository = repository_rule(
     attrs = {
