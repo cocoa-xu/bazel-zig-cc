@@ -46,10 +46,9 @@ def target_structs():
         for glibc in _GLIBCS:
             ret.append(_target_linux_gnu(gocpu, zigcpu, glibc))
 
-    for zigcpu, gocpu in (("arm", "arm")):
-        ret.append(_target_linux_musleabihf(gocpu, zigcpu))
-        for glibc in _GLIBCS:
-            ret.append(_target_linux_gnueabihf(gocpu, zigcpu, glibc))
+    ret.append(_target_linux_musleabihf("arm", "arm"))
+    for glibc in _GLIBCS:
+        ret.append(_target_linux_gnueabihf("arm", "arm", glibc))
     return ret
 
 def _target_macos(gocpu, zigcpu):

@@ -2,7 +2,6 @@ load("@bazel-zig-cc//toolchain/private:defs.bzl", "LIBCS")
 load("@bazel-zig-cc//toolchain/private:defs.bzl", "LIBCS_EABIHF")
 
 _CPUS = (("x86_64", "amd64"), ("aarch64", "arm64"), ("riscv64", "riscv64"))
-_CPUS_EABIHF = (("arm", "arm"))
 _OS = {
     "linux": ["linux"],
     "macos": ["macos", "darwin"],
@@ -30,16 +29,15 @@ def declare_libc_aware_platforms():
                 extra_constraints = ["@zig_sdk//libc:{}".format(libc)],
             )
 
-    for zigcpu, gocpu in _CPUS_EABIHF:
-        for libc in LIBCS_EABIHF:
-            declare_platform(
-                gocpu,
-                zigcpu,
-                "linux",
-                "linux",
-                suffix = "_{}".format(libc),
-                extra_constraints = ["@zig_sdk//libc:{}".format(libc)],
-            )
+    for libc in LIBCS_EABIHF:
+        declare_platform(
+            "arm",
+            "arm",
+            "linux",
+            "linux",
+            suffix = "_{}".format(libc),
+            extra_constraints = ["@zig_sdk//libc:{}".format(libc)],
+        )
 
 def declare_platform(gocpu, zigcpu, bzlos, os, suffix = "", extra_constraints = []):
     constraint_values = [
