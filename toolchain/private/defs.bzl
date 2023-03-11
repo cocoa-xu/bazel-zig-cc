@@ -28,7 +28,8 @@ _INCLUDE_TAIL = [
     "include",
 ]
 
-LIBCS = ["musl"] + ["gnu.{}".format(glibc) for glibc in _GLIBCS]
+LIBCS = ["musl"] + ["gnu.{}".format(glibc) for glibc in _GLIBCS] 
+LIBCS_EABIHF = ["musleabihf"] + ["gnueabihf.{}".format(glibc) for glibc in _GLIBCS]
 
 def zig_tool_path(os):
     if os == "windows":
@@ -38,12 +39,17 @@ def zig_tool_path(os):
 
 def target_structs():
     ret = []
-    for zigcpu, gocpu in (("x86_64", "amd64"), ("aarch64", "arm64"), ("riscv64", "riscv64"), ("arm", "arm")):
+    for zigcpu, gocpu in (("x86_64", "amd64"), ("aarch64", "arm64"), ("riscv64", "riscv64")):
         ret.append(_target_macos(gocpu, zigcpu))
         ret.append(_target_windows(gocpu, zigcpu))
         ret.append(_target_linux_musl(gocpu, zigcpu))
         for glibc in _GLIBCS:
             ret.append(_target_linux_gnu(gocpu, zigcpu, glibc))
+
+    for zigcpu, gocpu in (("arm", "arm")):
+        ret.append(_target_linux_musleabihf(gocpu, zigcpu))
+        for glibc in _GLIBCS:
+            ret.append(_target_linux_gnueabihf(gocpu, zigcpu, glibc))
     return ret
 
 def _target_macos(gocpu, zigcpu):
@@ -120,8 +126,6 @@ def _target_windows(gocpu, zigcpu):
 
 def _target_linux_gnu(gocpu, zigcpu, glibc_version):
     glibc_suffix = "gnu.{}".format(glibc_version)
-    if zigcpu == "arm":
-        glibc_suffix = "gnueabihf.{}".format(glibc_version)
 
     compiler_extra_includes = []
     linker_version_scripts = []
@@ -137,7 +141,47 @@ def _target_linux_gnu(gocpu, zigcpu, glibc_version):
         gotarget = "linux_{}_{}".format(gocpu, glibc_suffix),
         zigtarget = "{}-linux-{}".format(zigcpu, glibc_suffix),
         includes = [
-                       "libc/include/{}-linux-{}".format(zigcpu, "gnu" if zigcpu != "arm" else "gnueabihf"),
+                       "libc/include/{}-linux-gnu".format(zigcpu),
+                       "libc/include/generic-glibc",
+                   ] +
+                   # x86_64-linux-any is x86_64-linux and x86-linux combined.
+                   (["libc/include/x86-linux-any"] if zigcpu == "x86_64" else []) +
+                   (["libc/include/{}-linux-any".format(zigcpu)] if zigcpu != "x86_64" else []) + [
+            "libc/include/any-linux-any",
+        ] + _INCLUDE_TAIL,
+        compiler_extra_includes = compiler_extra_includes,
+        linker_version_scripts = linker_version_scripts,
+        dynamic_library_linkopts = [],
+        copts = [],
+        libc = "glibc",
+        bazel_target_cpu = "k8",
+        constraint_values = [
+            "@platforms//os:linux",
+            "@platforms//cpu:{}".format(zigcpu),
+        ],
+        libc_constraint = "@zig_sdk//libc:{}".format(glibc_suffix),
+        tool_paths = {"ld": "ld.lld"},
+        artifact_name_patterns = [],
+    )
+
+def _target_linux_gnueabihf(gocpu, zigcpu, glibc_version):
+    glibc_suffix = "gnueabihf.{}".format(glibc_version)
+
+    compiler_extra_includes = []
+    linker_version_scripts = []
+    if glibc_version < "2.28":
+        # https://github.com/ziglang/zig/issues/5882#issuecomment-888250676
+        compiler_extra_includes.append("glibc-hacks/fcntl.h")
+        linker_version_scripts.append("glibc-hacks/fcntl.map")
+    if glibc_version < "2.34":
+        compiler_extra_includes.append("glibc-hacks/res_search-{}.h".format(gocpu))
+        linker_version_scripts.append("glibc-hacks/res_search-{}.map".format(gocpu))
+
+    return struct(
+        gotarget = "linux_{}_{}".format(gocpu, glibc_suffix),
+        zigtarget = "{}-linux-{}".format(zigcpu, glibc_suffix),
+        includes = [
+                       "libc/include/{}-linux-gnueabihf".format(zigcpu),
                        "libc/include/generic-glibc",
                    ] +
                    # x86_64-linux-any is x86_64-linux and x86-linux combined.
@@ -162,10 +206,10 @@ def _target_linux_gnu(gocpu, zigcpu, glibc_version):
 
 def _target_linux_musl(gocpu, zigcpu):
     return struct(
-        gotarget = "linux_{}_{}".format(gocpu, "musl" if zigcpu != "arm" else "musleabihf"),
-        zigtarget = "{}-linux-{}".format(zigcpu, "musl" if zigcpu != "arm" else "musleabihf"),
+        gotarget = "linux_{}_musl".format(gocpu),
+        zigtarget = "{}-linux-musl".format(zigcpu),
         includes = [
-                       "libc/include/{}-linux-{}".format(zigcpu, "musl" if zigcpu != "arm" else "musleabihf"),
+                       "libc/include/{}-linux-musl".format(zigcpu),
                        "libc/include/generic-musl",
                    ] +
                    (["libc/include/riscv-linux-any"] if zigcpu == "riscv64" else []) +
@@ -182,7 +226,34 @@ def _target_linux_musl(gocpu, zigcpu):
             "@platforms//os:linux",
             "@platforms//cpu:{}".format(zigcpu),
         ],
-        libc_constraint = "@zig_sdk//libc:{}".format("musl" if zigcpu != "arm" else "musleabihf"),
+        libc_constraint = "@zig_sdk//libc:musl",
+        tool_paths = {"ld": "ld.lld"},
+        artifact_name_patterns = [],
+    )
+
+def _target_linux_musleabihf(gocpu, zigcpu):
+    return struct(
+        gotarget = "linux_{}_musleabihf".format(gocpu),
+        zigtarget = "{}-linux-musleabihf".format(zigcpu),
+        includes = [
+                       "libc/include/{}-linux-musleabihf".format(zigcpu),
+                       "libc/include/generic-musl",
+                   ] +
+                   (["libc/include/riscv-linux-any"] if zigcpu == "riscv64" else []) +
+                   # x86_64-linux-any is x86_64-linux and x86-linux combined.
+                   (["libc/include/x86-linux-any"] if zigcpu == "x86_64" else []) +
+                   (["libc/include/{}-linux-any".format(zigcpu)] if zigcpu != "x86_64" else []) + [
+            "libc/include/any-linux-any",
+        ] + _INCLUDE_TAIL,
+        dynamic_library_linkopts = [],
+        copts = ["-D_LIBCPP_HAS_MUSL_LIBC", "-D_LIBCPP_HAS_THREAD_API_PTHREAD"],
+        libc = "musl",
+        bazel_target_cpu = "k8",
+        constraint_values = [
+            "@platforms//os:linux",
+            "@platforms//cpu:{}".format(zigcpu),
+        ],
+        libc_constraint = "@zig_sdk//libc:musleabihf",
         tool_paths = {"ld": "ld.lld"},
         artifact_name_patterns = [],
     )
