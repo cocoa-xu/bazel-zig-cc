@@ -38,7 +38,7 @@ def zig_tool_path(os):
 
 def target_structs():
     ret = []
-    for zigcpu, gocpu in (("x86_64", "amd64"), ("aarch64", "arm64"), ("riscv64", "riscv64")):
+    for zigcpu, gocpu in (("x86_64", "amd64"), ("aarch64", "arm64"), ("riscv64", "riscv64"), ("armv6", "armv6")):
         ret.append(_target_macos(gocpu, zigcpu))
         ret.append(_target_windows(gocpu, zigcpu))
         ret.append(_target_linux_musl(gocpu, zigcpu))

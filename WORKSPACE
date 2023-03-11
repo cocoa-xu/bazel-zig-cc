@@ -53,9 +53,10 @@ zig_toolchains()
 
 register_toolchains(
     # if no `--platform` is specified, these toolchains will be used for
-    # (linux,darwin,windows)x(amd64,arm64,riscv64)
+    # (linux,darwin,windows)x(amd64,arm64,riscv64,armv6)
     "@zig_sdk//toolchain:linux_amd64_gnu.2.19",
     "@zig_sdk//toolchain:linux_arm64_gnu.2.28",
+    "@zig_sdk//toolchain:linux_armv6_gnu.2.28",
     "@zig_sdk//toolchain:linux_riscv64_gnu.2.28",
     "@zig_sdk//toolchain:darwin_amd64",
     "@zig_sdk//toolchain:darwin_arm64",
@@ -70,6 +71,9 @@ register_toolchains(
     # arm64 toolchains for libc-aware platforms:
     "@zig_sdk//libc_aware/toolchain:linux_arm64_gnu.2.28",
     "@zig_sdk//libc_aware/toolchain:linux_arm64_musl",
+    # armv6 toolchains for libc-aware platforms:
+    "@zig_sdk//libc_aware/toolchain:linux_armv6_gnu.2.28",
+    "@zig_sdk//libc_aware/toolchain:linux_armv6_musl",
     # riscv64 toolchains for libc-aware platforms:
     "@zig_sdk//libc_aware/toolchain:linux_riscv64_gnu.2.28",
     "@zig_sdk//libc_aware/toolchain:linux_riscv64_musl",
