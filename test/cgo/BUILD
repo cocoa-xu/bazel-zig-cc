@@ -39,7 +39,7 @@ go_binary(
         ("linux_riscv64_musl", "//libc_aware/platform:linux_riscv64_musl"),
         ("linux_riscv64_gnu.2.28", "//libc_aware/platform:linux_riscv64_gnu.2.28"),
         ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl"),
-        ("linux_armv6_gnu.2.28", "//libc_aware/platform:linux_armv6_gnu.2.28"),
+        ("linux_armv6_gnueabihf.2.28", "//libc_aware/platform:linux_armv6_gnueabihf.2.28"),
         ("darwin_amd64", "//platform:darwin_amd64"),
     ]
 ]
@@ -60,7 +60,7 @@ go_binary(
         ("linux_riscv64_musl", "//libc_aware/platform:linux_riscv64_musl", False),
         ("linux_riscv64_gnu.2.28", "//libc_aware/platform:linux_riscv64_gnu.2.28", False),
         ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl", False),
-        ("linux_armv6_gnu.2.28", "//libc_aware/platform:linux_armv6_gnu.2.28", False),
+        ("linux_armv6_gnueabihf.2.28", "//libc_aware/platform:linux_armv6_gnueabihf.2.28", False),
     ]
 ]
 
@@ -80,7 +80,7 @@ go_binary(
         ("linux_riscv64_musl", "//libc_aware/platform:linux_riscv64_musl", True),
         ("linux_riscv64_gnu.2.28", "//libc_aware/platform:linux_riscv64_gnu.2.28", True),
         ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl", False),
-        ("linux_armv6_gnu.2.28", "//libc_aware/platform:linux_armv6_gnu.2.28", False),
+        ("linux_armv6_gnueabihf.2.28", "//libc_aware/platform:linux_armv6_gnueabihf.2.28", False),
     ]
 ]
 
@@ -100,6 +100,6 @@ go_binary(
         ("linux_riscv64_musl", "//libc_aware/platform:linux_riscv64_musl", False),
         ("linux_riscv64_gnu.2.28", "//libc_aware/platform:linux_riscv64_gnu.2.28", False),
         ("linux_armv6_musl", "//libc_aware/platform:linux_armv6_musl", True),
-        ("linux_armv6_gnu.2.28", "//libc_aware/platform:linux_armv6_gnu.2.28", True),
+        ("linux_armv6_gnueabihf.2.28", "//libc_aware/platform:linux_armv6_gnueabihf.2.28", True),
     ]
 ]
