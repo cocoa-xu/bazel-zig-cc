@@ -156,6 +156,36 @@ def _zig_tool_wrapper(zig_tool, is_windows, cache_prefix, zigtarget):
     else:
         return _ZIG_TOOL_WRAPPER_CACHE.format(**kwargs)
 
+_template_mapfile = """
+%s {
+    %s;
+};
+"""
+
+_template_linker = """
+#ifdef __ASSEMBLER__
+.symver {from_function}, {to_function_abi}
+#else
+__asm__(".symver {from_function}, {to_function_abi}");
+#endif
+"""
+
+def _glibc_hack(from_function, to_function_abi):
+    # Cannot use .format(...) here, because starlark thinks
+    # that the byte 3 (the opening brace on the first line)
+    # is a nested { ... }, returning an error:
+    # Error in format: Nested replacement fields are not supported
+    to_function, to_abi = to_function_abi.split("@")
+    mapfile = _template_mapfile % (to_abi, to_function)
+    header = _template_linker.format(
+        from_function = from_function,
+        to_function_abi = to_function_abi,
+    )
+    return struct(
+        mapfile = mapfile,
+        header = header,
+    )
+
 def _quote(s):
     return "'" + s.replace("'", "'\\''") + "'"
 
@@ -242,6 +272,9 @@ def _zig_repository_impl(repository_ctx):
         "glibc-hacks/glibchack-fcntl.h",
         content = _fcntl_h,
     )
+    res_search_arm = _glibc_hack("res_search", "__res_search@GLIBC_2.17")
+    repository_ctx.file("glibc-hacks/res_search-arm.map", content = res_search_arm.mapfile)
+    repository_ctx.file("glibc-hacks/res_search-arm.h", content = res_search_arm.header)
 
 zig_repository = repository_rule(
     attrs = {
