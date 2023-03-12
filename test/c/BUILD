@@ -13,9 +13,9 @@ cc_binary(
         platform_binary(
             name = "which_libc_{}".format(name),
             src = "which_libc",
-            env = {"QEMU_LD_PREFIX": "/usr/aarch64-linux-gnu"} if "arm64" in name else {},
+            env = {"QEMU_LD_PREFIX": "/usr/aarch64-linux-gnu"} if "arm64" in name else {"QEMU_LD_PREFIX": "/usr/arm-linux-gnueabihf"} if "linux_arm" == name else {},
             platform = platform,
-            run_under = "qemu-aarch64-static" if "arm64" in name else "",
+            run_under = "qemu-aarch64-static" if "arm64" in name else "qemu-arm-static" if "linux_arm" == name else "",
         ),
         sh_test(
             name = "test_libc_{}".format(name),
@@ -34,5 +34,6 @@ cc_binary(
         ("linux_arm64_musl", "//libc_aware/platform:linux_arm64_musl", "non-glibc"),
         ("linux_amd64", "//platform:linux_amd64", "glibc_2.19"),
         ("linux_arm64", "//platform:linux_arm64", "glibc_2.28"),
+        ("linux_arm", "//platform:linux_arm", "glibc_2.28"),
     ]
 ]

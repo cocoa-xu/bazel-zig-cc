@@ -1,4 +1,5 @@
 load("@bazel-zig-cc//toolchain/private:defs.bzl", "LIBCS")
+load("@bazel-zig-cc//toolchain/private:defs.bzl", "LIBCS_EABIHF")
 
 _CPUS = (("x86_64", "amd64"), ("aarch64", "arm64"))
 _OS = {
@@ -13,6 +14,10 @@ def declare_platforms():
         for bzlos, oss in _OS.items():
             for os in oss:
                 declare_platform(gocpu, zigcpu, bzlos, os)
+    
+    for bzlos, oss in _OS.items():
+        for os in oss:
+            declare_platform("arm", "arm", bzlos, os)
 
 def declare_libc_aware_platforms():
     # create @zig_sdk//{os}_{arch}_platform entries with zig and go conventions
@@ -28,6 +33,16 @@ def declare_libc_aware_platforms():
                 extra_constraints = ["@zig_sdk//libc:{}".format(libc)],
             )
 
+    for libc in LIBCS_EABIHF:
+        declare_platform(
+            "arm",
+            "arm",
+            "linux",
+            "linux",
+            suffix = "_{}".format(libc),
+            extra_constraints = ["@zig_sdk//libc:{}".format(libc)],
+        )
+
 def declare_platform(gocpu, zigcpu, bzlos, os, suffix = "", extra_constraints = []):
     constraint_values = [
         "@platforms//os:{}".format(bzlos),
@@ -39,7 +54,8 @@ def declare_platform(gocpu, zigcpu, bzlos, os, suffix = "", extra_constraints = 
         constraint_values = constraint_values,
     )
 
-    native.platform(
-        name = "{os}_{gocpu}{suffix}".format(os = os, gocpu = gocpu, suffix = suffix),
-        constraint_values = constraint_values,
-    )
+    if gocpu != zigcpu:
+        native.platform(
+            name = "{os}_{gocpu}{suffix}".format(os = os, gocpu = gocpu, suffix = suffix),
+            constraint_values = constraint_values,
+        )
